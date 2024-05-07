@@ -1,0 +1,453 @@
+[cloudera@quickstart ~]$ hive
+
+Logging initialized using configuration in file:/etc/hive/conf.dist/hive-log4j.properties
+WARNING: Hive CLI is deprecated and migration to Beeline is recommended.
+hive> show databases;
+OK
+default
+Time taken: 2.616 seconds, Fetched: 1 row(s)
+hive> create database College;
+OK
+Time taken: 1.345 seconds
+hive> use College;
+OK
+Time taken: 0.27 seconds
+hive> create table Student (Name STRING,Class STRING,RollNo INT);
+OK
+Time taken: 1.222 seconds
+hive> describe Student;
+OK
+name                	string              	                    
+class               	string              	                    
+rollno              	int                 	                    
+Time taken: 0.512 seconds, Fetched: 3 row(s)
+hive> insert into Student values ("Abhi","TE",3073);
+Query ID = cloudera_20240421213131_e288dd87-cc41-49c4-b946-cab7701ac6a9
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1713759138096_0001, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1713759138096_0001/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1713759138096_0001
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2024-04-21 21:32:07,007 Stage-1 map = 0%,  reduce = 0%
+2024-04-21 21:32:33,087 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 4.12 sec
+MapReduce Total cumulative CPU time: 4 seconds 120 msec
+Ended Job = job_1713759138096_0001
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/college.db/student/.hive-staging_hive_2024-04-21_21-31-16_126_5237580884738092723-1/-ext-10000
+Loading data to table college.student
+Table college.student stats: [numFiles=1, numRows=1, totalSize=13, rawDataSize=12]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 4.12 sec   HDFS Read: 3698 HDFS Write: 84 SUCCESS
+Total MapReduce CPU Time Spent: 4 seconds 120 msec
+OK
+Time taken: 80.88 seconds
+hive> select * from Student;
+OK
+Abhi	TE	3073
+Time taken: 0.419 seconds, Fetched: 1 row(s)
+hive> ALTER TABLE Student RENAME TO Student_info;
+OK
+Time taken: 0.387 seconds
+hive> select * from Student_info;
+OK
+Abhi	TE	3073
+Time taken: 0.159 seconds, Fetched: 1 row(s)
+hive> drop table Student_info;
+OK
+Time taken: 1.461 seconds
+hive> create external table flight_info (year INT,month INT,day INT,day_of_week INT,dep_time INT,crs_dep_time INT,arr_time INT,crs_arr_time INT,unique_carrier STRING,flight_num INT,tail_num STRING,actual_elapsed_time INT,crs_elapsed_time INT,air_time INT,arr_delay INT,dep_delay INT,origin STRING,dest STRING,distance INT,taxi_in INT,taxi_out INT,cancelled INT,cancellation_code STRING,diverted INT,carrier_delay STRING,weather_delay STRING,nas_delay STRING,security_delay STRING,late_aircraft_delay STRING) row format delimited fields terminated by ',' stored as textfile location "/Hive/flight_info.csv";
+
+
+hive> create external table flight_info (year INT,month INT,day INT,day_of_week INT,dep_time INT,crs_dep_time INT,arr_time INT,crs_arr_time INT,unique_carrier STRING,flight_num INT,tail_num STRING,actual_elapsed_time INT,crs_elapsed_time INT,air_time INT,arr_delay INT,dep_delay INT,origin STRING,dest STRING,distance INT,taxi_in INT,taxi_out INT,cancelled INT,cancellation_code STRING,diverted INT,carrier_delay STRING,weather_delay STRING,nas_delay STRING,security_delay STRING,late_aircraft_delay STRING) row format delimited fields terminated by ',' location '/Hive/';
+OK
+Time taken: 0.541 seconds
+hive> SELECT * FROM flight_info LIMIT 10;
+OK
+2008	1	3	4	2003	1955	2211	2225	WN	335	N712SW	128	150	116	-14	8	IAD	TPA	810	4	8	00	NA	NA	NA	NA	NA
+2008	1	3	4	754	735	1002	1000	WN	3231	N772SW	128	145	113	2	19	IAD	TPA	810	5	10	00	NA	NA	NA	NA	NA
+2008	1	3	4	628	620	804	750	WN	448	N428WN	96	90	76	14	8	IND	BWI	515	3	17	00	NA	NA	NA	NA	NA
+2008	1	3	4	926	930	1054	1100	WN	1746	N612SW	88	90	78	-6	-4	IND	BWI	515	3	7	00	NA	NA	NA	NA	NA
+2008	1	3	4	1829	1755	1959	1925	WN	3920	N464WN	90	90	77	34	34	IND	BWI	515	3	10	00	2	0	0	0	32
+2008	1	3	4	1940	1915	2121	2110	WN	378	N726SW	101	115	87	11	25	IND	JAX	688	4	10	00	NA	NA	NA	NA	NA
+2008	1	3	4	1937	1830	2037	1940	WN	509	N763SW	240	250	230	57	67	IND	LAS	1591	3	7	00	10	0	0	0	47
+2008	1	3	4	1039	1040	1132	1150	WN	535	N428WN	233	250	219	-18	-1	IND	LAS	1591	7	7	00	NA	NA	NA	NA	NA
+2008	1	3	4	617	615	652	650	WN	11	N689SW	95	95	70	2	2	IND	MCI	451	6	19	00	NA	NA	NA	NA	NA
+2008	1	3	4	1620	1620	1639	1655	WN	810	N648SW	79	95	70	-16	0	IND	MCI	451	3	6	00	NA	NA	NA	NA	NA
+Time taken: 4.752 seconds, Fetched: 10 row(s)
+hive> 
+hive> SELECT day,AVG(dep_delay) FROM flight_info GROUP BY day;
+Query ID = cloudera_20240422015454_1233c67c-df6a-4329-8a89-5d3d5de28d71
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1713759138096_0002, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1713759138096_0002/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1713759138096_0002
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2024-04-22 01:56:33,948 Stage-1 map = 0%,  reduce = 0%
+2024-04-22 01:57:34,207 Stage-1 map = 0%,  reduce = 0%, Cumulative CPU 4.07 sec
+2024-04-22 01:57:35,473 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 4.93 sec
+2024-04-22 01:58:21,827 Stage-1 map = 100%,  reduce = 67%, Cumulative CPU 6.3 sec
+2024-04-22 01:58:34,190 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 10.15 sec
+MapReduce Total cumulative CPU time: 10 seconds 150 msec
+Ended Job = job_1713759138096_0002
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 10.15 sec   HDFS Read: 25381917 HDFS Write: 658 SUCCESS
+Total MapReduce CPU Time Spent: 10 seconds 150 msec
+OK
+1	17.57681842916742
+2	23.900056359195943
+3	19.370313695485844
+4	18.612678509230232
+5	25.976967114898148
+6	22.146653781106547
+7	14.395251396648044
+8	12.124760306807287
+9	5.839149336153214
+10	9.223829201101928
+11	9.410679275746743
+12	1.6842865395725015
+13	6.079343193782903
+14	4.633204633204633
+15	5.640961857379768
+16	1.9354166666666666
+17	18.21534910559723
+18	12.01187917185202
+19	7.5900463308922435
+20	6.213233458177278
+21	25.198426472289714
+22	17.538498383427136
+23	11.585463541053128
+24	9.975531671621313
+25	14.944508404328804
+26	4.631294964028777
+27	25.05219499744768
+28	14.486067019400354
+29	9.989655592065231
+30	6.108780661215784
+31	27.131638620360423
+Time taken: 223.0 seconds, Fetched: 31 row(s)
+hive> create table one (Name STRING,ID INT);
+OK
+Time taken: 0.428 seconds
+hive> insert into one values('Abhi',123);
+Query ID = cloudera_20240422020202_ff41487d-a454-4583-ad5b-2e6f3382a14f
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1713759138096_0003, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1713759138096_0003/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1713759138096_0003
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2024-04-22 02:03:08,289 Stage-1 map = 0%,  reduce = 0%
+2024-04-22 02:04:01,185 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 6.09 sec
+MapReduce Total cumulative CPU time: 6 seconds 90 msec
+Ended Job = job_1713759138096_0003
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/college.db/one/.hive-staging_hive_2024-04-22_02-02-06_809_1878552736321746431-1/-ext-10000
+Loading data to table college.one
+Table college.one stats: [numFiles=1, numRows=1, totalSize=9, rawDataSize=8]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 6.09 sec   HDFS Read: 3471 HDFS Write: 76 SUCCESS
+Total MapReduce CPU Time Spent: 6 seconds 90 msec
+OK
+Time taken: 120.574 seconds
+hive> create table two (Name STRING,RollNo INT);
+OK
+Time taken: 0.404 seconds
+hive> insert into two values ('Rushi',234);
+Query ID = cloudera_20240422020505_02090b48-6dce-4a26-a5f3-4bd65a55b6c0
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1713759138096_0004, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1713759138096_0004/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1713759138096_0004
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2024-04-22 02:06:11,172 Stage-1 map = 0%,  reduce = 0%
+2024-04-22 02:07:11,368 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 6.64 sec
+MapReduce Total cumulative CPU time: 6 seconds 640 msec
+Ended Job = job_1713759138096_0004
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/college.db/two/.hive-staging_hive_2024-04-22_02-05-10_045_7222452873134199379-1/-ext-10000
+Loading data to table college.two
+Table college.two stats: [numFiles=1, numRows=1, totalSize=10, rawDataSize=9]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 6.64 sec   HDFS Read: 3484 HDFS Write: 77 SUCCESS
+Total MapReduce CPU Time Spent: 6 seconds 640 msec
+OK
+Time taken: 126.696 seconds
+hive> select * from one;
+OK
+Abhi	123
+Time taken: 0.4 seconds, Fetched: 1 row(s)
+hive> select * from two;
+OK
+Rushi	234
+Time taken: 0.25 seconds, Fetched: 1 row(s)
+hive> create external table fest (name STRING,id INT,city STRING) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LOCATION '/Hive/';
+OK
+Time taken: 0.263 seconds
+hive> create table data (city STRING);
+OK
+Time taken: 0.535 seconds
+hive> insert into data values ('PUNE');
+Query ID = cloudera_20240422021616_096fa6b5-819e-4d69-9fee-ed3c02a63175
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1713759138096_0005, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1713759138096_0005/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1713759138096_0005
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2024-04-22 02:17:21,583 Stage-1 map = 0%,  reduce = 0%
+2024-04-22 02:18:16,423 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 3.93 sec
+MapReduce Total cumulative CPU time: 3 seconds 930 msec
+Ended Job = job_1713759138096_0005
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/college.db/data/.hive-staging_hive_2024-04-22_02-16-21_375_2524915988136903440-1/-ext-10000
+Loading data to table college.data
+Table college.data stats: [numFiles=1, numRows=1, totalSize=5, rawDataSize=4]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 4.15 sec   HDFS Read: 3110 HDFS Write: 73 SUCCESS
+Total MapReduce CPU Time Spent: 4 seconds 150 msec
+OK
+Time taken: 121.048 seconds
+hive> SELECT * FROM data;
+OK
+PUNE
+Time taken: 0.299 seconds, Fetched: 1 row(s)
+hive> SELECT s.name,s.id,d.city
+    > FROM one s
+    > LEFT OUTER JOIN data d
+    > ;
+Warning: Map Join MAPJOIN[7][bigTable=s] in task 'Stage-3:MAPRED' is a cross product
+Query ID = cloudera_20240422022222_db12dbb7-4628-4082-bc80-f4dafce21ae8
+Total jobs = 1
+Execution log at: /tmp/cloudera/cloudera_20240422022222_db12dbb7-4628-4082-bc80-f4dafce21ae8.log
+2024-04-22 02:22:44	Starting to launch local task to process map join;	maximum memory = 1013645312
+2024-04-22 02:22:57	Dump the side-table for tag: 1 with group count: 1 into file: file:/tmp/cloudera/c0643354-ffe1-43b4-8000-1c63e54f0464/hive_2024-04-22_02-22-18_550_7606353176335428596-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile01--.hashtable
+2024-04-22 02:22:58	Uploaded 1 File to: file:/tmp/cloudera/c0643354-ffe1-43b4-8000-1c63e54f0464/hive_2024-04-22_02-22-18_550_7606353176335428596-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile01--.hashtable (282 bytes)
+2024-04-22 02:22:58	End of local task; Time Taken: 13.965 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1713759138096_0006, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1713759138096_0006/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1713759138096_0006
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 0
+2024-04-22 02:24:19,809 Stage-3 map = 0%,  reduce = 0%
+2024-04-22 02:24:46,924 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 2.9 sec
+MapReduce Total cumulative CPU time: 2 seconds 900 msec
+Ended Job = job_1713759138096_0006
+MapReduce Jobs Launched: 
+Stage-Stage-3: Map: 1   Cumulative CPU: 2.9 sec   HDFS Read: 5579 HDFS Write: 14 SUCCESS
+Total MapReduce CPU Time Spent: 2 seconds 900 msec
+OK
+Abhi	123	PUNE
+Time taken: 150.701 seconds, Fetched: 1 row(s)
+hive> CREATE INDEX NEW ON TABLE flight_info(day) AS 'org.apache.hadoop.hive.ql.index.compact.CompactIndexHandler' WITH DIFFERED REBUILD;
+MismatchedTokenException(26!=79)
+	at org.antlr.runtime.BaseRecognizer.recoverFromMismatchedToken(BaseRecognizer.java:617)
+	at org.antlr.runtime.BaseRecognizer.match(BaseRecognizer.java:115)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.autoRebuild(HiveParser.java:6025)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.createIndexStatement(HiveParser.java:5578)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.ddlStatement(HiveParser.java:2520)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.execStatement(HiveParser.java:1579)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.statement(HiveParser.java:1057)
+	at org.apache.hadoop.hive.ql.parse.ParseDriver.parse(ParseDriver.java:199)
+	at org.apache.hadoop.hive.ql.parse.ParseDriver.parse(ParseDriver.java:166)
+	at org.apache.hadoop.hive.ql.Driver.compile(Driver.java:393)
+	at org.apache.hadoop.hive.ql.Driver.compile(Driver.java:307)
+	at org.apache.hadoop.hive.ql.Driver.compileInternal(Driver.java:1110)
+	at org.apache.hadoop.hive.ql.Driver.runInternal(Driver.java:1158)
+	at org.apache.hadoop.hive.ql.Driver.run(Driver.java:1047)
+	at org.apache.hadoop.hive.ql.Driver.run(Driver.java:1037)
+	at org.apache.hadoop.hive.cli.CliDriver.processLocalCmd(CliDriver.java:207)
+	at org.apache.hadoop.hive.cli.CliDriver.processCmd(CliDriver.java:159)
+	at org.apache.hadoop.hive.cli.CliDriver.processLine(CliDriver.java:370)
+	at org.apache.hadoop.hive.cli.CliDriver.executeDriver(CliDriver.java:756)
+	at org.apache.hadoop.hive.cli.CliDriver.run(CliDriver.java:675)
+	at org.apache.hadoop.hive.cli.CliDriver.main(CliDriver.java:615)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.apache.hadoop.util.RunJar.run(RunJar.java:221)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:136)
+FAILED: ParseException line 1:113 mismatched input 'DIFFERED' expecting KW_DEFERRED near 'WITH' in auto rebuild index
+hive> CREATE INDEX NEW ON TABLE flight_info(day) AS 'org.apache.hadoop.hive.ql.index.compact.CompactIndexHandler' WITH DEFERED REBUILD;
+MismatchedTokenException(26!=79)
+	at org.antlr.runtime.BaseRecognizer.recoverFromMismatchedToken(BaseRecognizer.java:617)
+	at org.antlr.runtime.BaseRecognizer.match(BaseRecognizer.java:115)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.autoRebuild(HiveParser.java:6025)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.createIndexStatement(HiveParser.java:5578)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.ddlStatement(HiveParser.java:2520)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.execStatement(HiveParser.java:1579)
+	at org.apache.hadoop.hive.ql.parse.HiveParser.statement(HiveParser.java:1057)
+	at org.apache.hadoop.hive.ql.parse.ParseDriver.parse(ParseDriver.java:199)
+	at org.apache.hadoop.hive.ql.parse.ParseDriver.parse(ParseDriver.java:166)
+	at org.apache.hadoop.hive.ql.Driver.compile(Driver.java:393)
+	at org.apache.hadoop.hive.ql.Driver.compile(Driver.java:307)
+	at org.apache.hadoop.hive.ql.Driver.compileInternal(Driver.java:1110)
+	at org.apache.hadoop.hive.ql.Driver.runInternal(Driver.java:1158)
+	at org.apache.hadoop.hive.ql.Driver.run(Driver.java:1047)
+	at org.apache.hadoop.hive.ql.Driver.run(Driver.java:1037)
+	at org.apache.hadoop.hive.cli.CliDriver.processLocalCmd(CliDriver.java:207)
+	at org.apache.hadoop.hive.cli.CliDriver.processCmd(CliDriver.java:159)
+	at org.apache.hadoop.hive.cli.CliDriver.processLine(CliDriver.java:370)
+	at org.apache.hadoop.hive.cli.CliDriver.executeDriver(CliDriver.java:756)
+	at org.apache.hadoop.hive.cli.CliDriver.run(CliDriver.java:675)
+	at org.apache.hadoop.hive.cli.CliDriver.main(CliDriver.java:615)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.apache.hadoop.util.RunJar.run(RunJar.java:221)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:136)
+FAILED: ParseException line 1:113 mismatched input 'DEFERED' expecting KW_DEFERRED near 'WITH' in auto rebuild index
+hive> CREATE INDEX NEW ON TABLE flight_info(day) AS 'org.apache.hadoop.hive.ql.index.compact.CompactIndexHandler' WITH DEFERRED REBUILD;
+OK
+Time taken: 0.867 seconds
+hive> SELECT origin,dest FROM flight_info WHERE day<3 LIMIT 5;
+OK
+MCI	IAH
+CLE	SDF
+TUL	EWR
+IAH	BNA
+EWR	MYR
+Time taken: 0.508 seconds, Fetched: 5 row(s)
+hive> select day,AVG(dep_delay) from flight_info where origin='IAD' group by day; 
+Query ID = cloudera_20240422031313_66103585-7ecf-4a2c-922c-b4627268898c
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1713759138096_0008, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1713759138096_0008/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1713759138096_0008
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2024-04-22 03:14:00,213 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 4.63 sec
+2024-04-22 03:14:23,652 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 8.17 sec
+MapReduce Total cumulative CPU time: 8 seconds 170 msec
+Ended Job = job_1713759138096_0008
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 8.17 sec   HDFS Read: 25382724 HDFS Write: 636 SUCCESS
+Total MapReduce CPU Time Spent: 8 seconds 170 msec
+OK
+1	18.795454545454547
+2	38.779310344827586
+3	13.441558441558442
+4	19.03726708074534
+5	24.95945945945946
+6	27.12883435582822
+7	14.962732919254659
+8	12.06875
+9	7.1835443037974684
+10	13.962732919254659
+11	15.936708860759493
+12	5.190476190476191
+13	11.866666666666667
+14	6.144654088050315
+15	4.1
+16	2.5063291139240507
+17	47.471014492753625
+18	25.15432098765432
+19	24.835616438356166
+20	24.99337748344371
+21	13.082278481012658
+22	20.602564102564102
+23	21.54248366013072
+24	14.095541401273886
+25	21.146496815286625
+26	8.4822695035461
+27	16.337748344370862
+28	11.058064516129033
+29	7.949685534591195
+30	10.529032258064516
+31	14.314465408805031
+Time taken: 81.628 seconds, Fetched: 31 row(s)
+hive> SELECT * FROM flight_info2 LIMIT 5;
+OK
+2008	1	3	4	2003	1955	2211	2225	WN	335	N712SW	128	150	116	-14	8	IAD	TPA	810	4	8	00	NA	NA	NA	NA	NA
+2008	1	3	4	754	735	1002	1000	WN	3231	N772SW	128	145	113	2	19	IAD	TPA	810	5	10	00	NA	NA	NA	NA	NA
+2008	1	3	4	628	620	804	750	WN	448	N428WN	96	90	76	14	8	IND	BWI	515	3	17	00	NA	NA	NA	NA	NA
+2008	1	3	4	926	930	1054	1100	WN	1746	N612SW	88	90	78	-6	-4	IND	BWI	515	3	7	00	NA	NA	NA	NA	NA
+2008	1	3	4	1829	1755	1959	1925	WN	3920	N464WN	90	90	77	34	34	IND	BWI	515	3	10	00	2	0	0	0	32
+Time taken: 0.427 seconds, Fetched: 5 row(s)
+hive> select day,AVG(dep_delay) from flight_info2 where origin='IAD' group by day; 
+Query ID = cloudera_20240422072020_1dfdb9f3-1646-4708-a5a4-c1e87b844796
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1713759138096_0012, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1713759138096_0012/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1713759138096_0012
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2024-04-22 07:21:44,967 Stage-1 map = 0%,  reduce = 0%
+2024-04-22 07:22:43,159 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 7.36 sec
+2024-04-22 07:23:29,008 Stage-1 map = 100%,  reduce = 67%, Cumulative CPU 9.44 sec
+2024-04-22 07:23:38,470 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 12.58 sec
+MapReduce Total cumulative CPU time: 12 seconds 580 msec
+Ended Job = job_1713759138096_0012
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 12.58 sec   HDFS Read: 25125640 HDFS Write: 636 SUCCESS
+Total MapReduce CPU Time Spent: 12 seconds 580 msec
+OK
+1	18.795454545454547
+2	38.779310344827586
+3	13.441558441558442
+4	19.03726708074534
+5	24.95945945945946
+6	27.12883435582822
+7	14.962732919254659
+8	12.06875
+9	7.1835443037974684
+10	13.962732919254659
+11	15.936708860759493
+12	5.190476190476191
+13	11.866666666666667
+14	6.144654088050315
+15	4.1
+16	2.5063291139240507
+17	47.471014492753625
+18	25.15432098765432
+19	24.835616438356166
+20	24.99337748344371
+21	13.082278481012658
+22	20.602564102564102
+23	21.54248366013072
+24	14.095541401273886
+25	21.146496815286625
+26	8.4822695035461
+27	16.337748344370862
+28	11.058064516129033
+29	7.949685534591195
+30	10.529032258064516
+31	14.314465408805031
+Time taken: 177.84 seconds, Fetched: 31 row(s)
+hive> 
+
+
+
+
